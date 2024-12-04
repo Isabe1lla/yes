@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isabella and Alan Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ffb6c1, #b2f7ef); /* 粉色和薄荷绿渐变背景 */
+            margin: 0;
+            padding: 0;
+            color: #333;
+            scroll-behavior: smooth; /* 平滑滚动 */
+        }
+        header {
+            background: #f06292;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        nav {
+            background: #b2dfdb;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: #00695c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .content-section {
+            background: #fff;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .toolbar button, .toolbar select, .toolbar input[type="color"] {
+            margin: 0 5px;
+            padding: 10px;
+            background: #8bc34a;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .toolbar button:hover {
+            background: #689f38;
+        }
+        .content-editable {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f9f9f9;
+            min-height: 150px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        footer {
+            background: #ff6699;
+            color: #fff;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Never Let Me Go by Kazuo Ishiguro - Study Organizer</h1>
+</header>
+
+<nav>
+    <a href="#setting">Setting</a>
+    <a href="#characters">Characters</a>
+    <a href="#themes">Themes</a>
+    <a href="#important-moments">Important Moments</a>
+    <a href="#questions">Questions</a>
+    <a href="#additional-sections">Additional Sections</a>
+</nav>
+
+<!-- Search Box -->
+<div style="padding: 20px; text-align: center;">
+    <input type="text" id="searchBox" placeholder="Search..." onkeyup="searchKeyword()">
+    <div id="searchResult" style="margin-top: 10px;"></div>
+</div>
+
+<!-- Setting Section -->
+<div class="content-section" id="setting">
+    <h2>Setting</h2>
+    <div class="toolbar">
+        <button onclick="toggleBold()">Bold</button>
+        <button onclick="toggleItalic()">Italic</button>
+        <button onclick="highlightText()">Highlight</button>
+        <button onclick="removeHighlight()">Remove Highlight</button>
+        <button onclick="changeFontSize('increase')">A+</button>
+        <button onclick="changeFontSize('decrease')">A-</button>
+        <button onclick="changeTextColor()">Text Color</button>
+        <input type="color" id="colorPicker" onchange="updateTextColor()">
+    </div>
+    <div class="content-editable" contenteditable="true" id="setting-content">
+        <h3>Key Locations</h3>
+        <p><strong>Hailsham:</strong> A secluded boarding school where Kathy, Tommy, and Ruth grow up. It is an isolated, idealized space that hides the grim reality of their existence.
+            <span class="highlight">Example:</span> "We spent our days playing rounders on the lawn, completely unaware of what awaited us." (p. 45)</p>
+    </div>
+</div>
+
+<!-- Other Sections (Characters, Themes, etc.)... -->
+
+<script>
+    // Search Functionality
+    function searchKeyword() {
+        const keyword = document.getElementById('searchBox').value.toLowerCase();
+        const content = document.querySelectorAll('.content-editable');
+        let count = 0;
+
+        content.forEach(section => {
+            let text = section.innerText.toLowerCase();
+            let regex = new RegExp(keyword, "g");
+            let matches = text.match(regex);
+
+            if (matches) {
+                count += matches.length;
+                section.innerHTML = section.innerHTML.replace(regex, match => `<span style="background-color: yellow;">${match}</span>`);
+            }
+        });
+
+        document.getElementById('searchResult').innerText = `Found ${count} occurrence(s)`;
+    }
+
+    // Bold Text
+    function toggleBold() {
+        document.execCommand('bold', false, null);
+    }
+
+    // Italic Text
+    function toggleItalic() {
+        document.execCommand('italic', false, null);
+    }
+
+    // Highlight Text
+    function highlightText() {
+        document.execCommand('backColor', false, 'yellow');
+    }
+
+    // Remove Highlight
+    function removeHighlight() {
+        document.execCommand('removeFormat', false, null);
+    }
+
+    // Change Text Color
+    function changeTextColor() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const span = document.createElement('span');
+        span.style.color = document.getElementById('colorPicker').value;
+        range.surroundContents(span);
+    }
+
+    // Update Text Color
+    function updateTextColor() {
+        const color = document.getElementById('colorPicker').value;
+        changeTextColor(color);
+    }
+
+    // Change Font Size
+    function changeFontSize(action) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const selectedText = range.extractContents();
+        const span = document.createElement('span');
+
+        const currentSize = parseInt(window.getComputedStyle(range.startContainer.parentNode).fontSize) || 16;
+        const newSize = action === 'increase' ? currentSize + 2 : currentSize - 2;
+
+        span.style.fontSize = newSize + 'px';
+        span.appendChild(selectedText);
+        range.insertNode(span);
+    }
+</script>
+
+</body>
+</html>
